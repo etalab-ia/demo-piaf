@@ -8,8 +8,8 @@ Python 3.5+
 
 ## Usage
 
-> pip install -r requirements.txt
+    $ pip install -r requirements.txt
 
 Puis
 
-> streamlit run app.py
+    $ streamlit run app.py
