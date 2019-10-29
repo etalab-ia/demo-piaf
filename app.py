@@ -4,6 +4,7 @@ import streamlit as st
 import pandas as pd
 import time, re
 import wikipedia
+import lorem
 
 from multiprocessing import freeze_support
 
