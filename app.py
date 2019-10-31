@@ -10,6 +10,14 @@ from multiprocessing import freeze_support
 from cdqa.utils.download import download_model
 from cdqa.pipeline.cdqa_sklearn import QAPipeline
 
+HTML_WRAPPER = """<span style = "overflow-x: auto;
+								 color: white;
+								 background-color: rgb(246, 51, 102);
+								 border: 1px solid #e6e9ef;
+								 border-radius: 0.4rem;
+								 padding: 0.2rem;
+								 margin-bottom: 2.5rem">{}</span>"""
+
 if __name__ == '__main__':
 	freeze_support()
 
@@ -19,7 +27,7 @@ if __name__ == '__main__':
 	
 	langu = st.sidebar.selectbox("Langue", ["Anglais", "Français (en développement)"])
 	# mod = st.sidebar.selectbox("Modèle", ["Bert SQuAD 1.1", "Bert SQuAD 2.0"])
-	source = st.sidebar.selectbox("Source", ["Un article Wikipédia au choix", "Un paragraphe de votre cru"])
+	source = st.sidebar.selectbox("Source", ["La RGPD", "Un article Wikipédia au choix", "Un paragraphe de votre cru"])
 	
 	if "Wikipédia" in source:
 	
@@ -33,21 +41,27 @@ if __name__ == '__main__':
 		paragraphs.append([s for s in content if s != ''])
 		
 		df = pd.DataFrame({'id': id, 'title': title, 'paragraphs': paragraphs})
-		default_query = 'What is {}?'.format(pagename)
+		default_query = 'What is {}?'.format(page.title)
 		
 		st.header('Posez vos questions sur l\'article : {}'.format(page.title))
 		st.write("Introduction : *{}*".format(df.loc[0,'paragraphs'][0]))
+	
+	elif 'RGPD' in source:
 		
+		default_query = "Who can access my personal data?"
+		pattern = re.compile('Article\s\d{1,2}\.*')
+		f = open("data/GDPR.txt", "r", encoding='utf-8')
+		content = f.read().split('\n\n')
+		content = [c for c in content if pattern.match(c)]
+		df = pd.DataFrame([[0, 'RGPD', content]], columns=['id', 'title', 'paragraphs'])
+	
 	else:
 	
-		default = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. \
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. \
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. \
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+		default = "The use of artificial intelligence in public action is often identified as an opportunity to interrogate documentary texts and to create automatic question / answer tools for users. Querying natural language work code, providing a conversational agent for a given service, developing high-performance search engines, improving knowledge management, all activities that require quality training data corpus to develop question and answer algorithms. Today, there are no public and open French training data sets that would train these algorithms. The ambition of the PIAF project is to build this set of Francophone data for AI in an open and contributive way."
 		para = st.text_area('Ecrivez ici le paragraphe source', default)
 		df = pd.DataFrame([[0, 'My paragraph', [para]]], columns=['id', 'title', 'paragraphs'])
 		
-		default_query = 'What is it?'
+		default_query = 'What is the aim of PIAF?'
 	
 	### MODEL TRAINING SECTION ###
 	
@@ -74,6 +88,13 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 	
 	st.header('Réponse : {}\n'.format(prediction[0]))
 	# st.write('Article d\'où la réponse est extraite : *{}*\n'.format(prediction[1]))
-	st.write('Paragraphe de l\'article : *{}*\n'.format(prediction[2]))
+	res = prediction[2].replace(prediction[0], HTML_WRAPPER.format(prediction[0]))
+	if "Wikipédia" in source:
+		st.write('Paragraphe de l\'article : *{}*\n'.format(res), unsafe_allow_html=True)
+	elif "RGPD" in source:
+		st.write('Article concerné : *{}*\n'.format(res), unsafe_allow_html=True)
+	else:
+		st.write('Localisation de la réponse : *{}*\n'.format(res), unsafe_allow_html=True)
+	
 	st.write('Répondre à votre question a nécessité ', round(t3), ' secondes, charger le modèle', round(t1), 'secondes.')
 	
