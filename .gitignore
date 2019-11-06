@@ -2,3 +2,4 @@
 *.joblib
 *.csv
 *.json
+*.bin
