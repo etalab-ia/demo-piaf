@@ -99,7 +99,7 @@ if __name__ == '__main__':
     query = st.text_area('Posez votre question ici !', default_query)
     
     s3 = time.time()
-    prediction = cdqa_pipeline.predict(query)    
+    prediction = cdqa_pipeline.predict(query)
     t3 = time.time() - s3
     
     st.header('Réponse : {}\n'.format(prediction[0]))

@@ -26,6 +26,7 @@ import random
 import sys
 from io import open
 import uuid
+import re
 
 import numpy as np
 import torch
@@ -188,7 +189,7 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                     elif not is_impossible:
                         answer = qa["answers"][0]
                         orig_answer_text = answer["text"]
-                        answer_offset = 0 # answer["answer_start"]
+                        answer_offset = paragraph_text.find(orig_answer_text) # answer["answer_start"]
                         answer_length = len(orig_answer_text)
                         start_position = char_to_word_offset[answer_offset]
                         end_position = char_to_word_offset[answer_offset + answer_length - 1]
@@ -200,13 +201,13 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                         # guaranteed to be preserved.
                         actual_text = " ".join(doc_tokens[start_position : (end_position + 1)])
                         cleaned_answer_text = " ".join(whitespace_tokenize(orig_answer_text))
-                        # if actual_text.find(cleaned_answer_text) == -1:
-                            # logger.warning(
-                                # "Could not find answer: '%s' vs. '%s'",
-                                # actual_text,
-                                # cleaned_answer_text,
-                            # )
-                            # continue
+                        if actual_text.find(cleaned_answer_text) == -1:
+                            logger.warning(
+                                "Could not find answer: '%s' vs. '%s'",
+                                actual_text,
+                                cleaned_answer_text,
+                            )
+                            continue
                     else:
                         start_position = -1
                         end_position = -1
