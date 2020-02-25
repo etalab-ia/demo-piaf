@@ -150,9 +150,9 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
         input_data = input_file
 
     examples = []
-    for entry in input_data:
+    for entry in input_data['data']:
         for paragraph in entry["paragraphs"]:
-            paragraph_text = paragraph["text"]
+            paragraph_text = paragraph["context"]
             doc_tokens = []
             char_to_word_offset = []
             prev_is_whitespace = True
@@ -167,9 +167,9 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                     prev_is_whitespace = False
                 char_to_word_offset.append(len(doc_tokens) - 1)
 
-            for qa in paragraph["questions"]:
+            for qa in paragraph["qas"]:
                 # qas_id = qa["id"]
-                question_text = qa["text"]
+                question_text = qa["question"]
                 try:
                     retriever_score = qa["retriever_score"]
                 except KeyError:
@@ -224,7 +224,7 @@ def read_squad_examples(input_file, is_training, version_2_with_negative):
                             end_position=end_position,
                             is_impossible=is_impossible,
                             paragraph=paragraph_text,
-                            title=entry["displaytitle"],
+                            title=entry["title"],
                             retriever_score=retriever_score,
                         )
                     )

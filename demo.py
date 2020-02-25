@@ -25,7 +25,7 @@ if __name__ == '__main__':
     st.write("Ceci est un démonstrateur du potentiel d'un système de Question Answering, ici en anglais.\
               Posez vos questions sur un paragraphe de texte et admirez le résultat ! \N{bird}")
     
-    langu = st.sidebar.selectbox("Langue", ["Anglais", "Français (en développement)"])
+    langu = st.sidebar.selectbox("Langue", ["Français", "Anglais"])
     # mod = st.sidebar.selectbox("Modèle", ["Bert SQuAD 1.1", "Bert SQuAD 2.0"])
     source = st.sidebar.selectbox("Source", ["Le RGPD", "Un article Wikipédia au choix", "Un paragraphe de votre cru"])
     
@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     if not "Français" in langu:
         download_model(model='bert-squad_1.1', dir='./models')
-        cdqa_pipeline = QAPipeline(reader='models/bert_qa_vCPU-sklearn.joblib', max_df=1.0, min_df=1)
+        cdqa_pipeline = QAPipeline(reader='models/bert_qa.joblib', max_df=1.0, min_df=1)
     else:
         cdqa_pipeline = QAPipeline(reader='models/bert_qa_fr.joblib', max_df=1.0, min_df=1)
         
