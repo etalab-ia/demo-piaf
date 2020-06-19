@@ -12,4 +12,4 @@ Python 3.5+
 
 Puis pour lancer l'interface:
 
-    $ streamlit run app.py
+    $ streamlit run demo.py
